@@ -6,9 +6,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
+
+    <style>
+
+
+    </style>
 </head>
 
 <body>
+    <form id="photoForm">
+        <input type="file" name="file" id="pic">
+        <input type="submit" />
+    </form>
+
+    <canvas id="Canvas" width="600" height="400"></canvas>
+
+
+    <script>
+
+        const form = document.getElementById('photoForm');
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            let c = document.getElementById("Canvas");
+            let ctx = c.getContext("2d");
+            let org = document.createElement("IMG");
+            org.src = './' + document.getElementById("pic").files[0].name;         // 'http://thedersen.com/talks/2012/01/25/javascript-the-good-parts/images/bad-vs-good.jpg';
+
+            org.onload = () => {
+                ctx.drawImage(org, 0, 0, 600, 400);
+            }
+        })
+
+
+
+//             // startImageData = ctx.getImageData(0,0,600,400)
+
+
+    </script>
 
 </body>
 
