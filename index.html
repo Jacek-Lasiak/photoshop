@@ -21,27 +21,68 @@
 
     <canvas id="Canvas" width="600" height="400"></canvas>
 
+    <!-- <div id="mouseSlider" onmousemove="mouseMove(event)" onmouseout="clearCoor()"></div> -->
+    <form class="row">
+        <div>
+            <label for="red">Red: <span>100%</span></label>
+            <input type="range" id="red" min="0" max="100" value="100">
+        </div>
+        <div>
+            <label for="green">Green: <span>100%</span></label>
+            <input type="range" id="green" min="0" max="100" value="100">
+        </div>
+        <div>
+            <label for="blue">Blue: <span>100%</span></label>
+            <input type="range" id="blue" min="0" max="100" value="100">
+        </div>
+    </form>
 
     <script>
-
+        let c = document.getElementById("Canvas");
+        let ctx = c.getContext("2d");
         const form = document.getElementById('photoForm');
+        let redControl = document.getElementById('red');
+        let greenControl = document.getElementById('green');
+        let blueControl = document.getElementById('blue');
+
         form.addEventListener('submit', (e) => {
             e.preventDefault();
 
-            let c = document.getElementById("Canvas");
-            let ctx = c.getContext("2d");
+
             let org = document.createElement("IMG");
             org.src = './' + document.getElementById("pic").files[0].name;         // 'http://thedersen.com/talks/2012/01/25/javascript-the-good-parts/images/bad-vs-good.jpg';
 
             org.onload = () => {
                 ctx.drawImage(org, 0, 0, 600, 400);
             }
+
+
+
+            readPixels = ctx.getImageData(0, 0, c.width, c.height);
+            writePixels = ctx.getImageData(0, 0, c.width, c.height);
+            applayFilter();
         })
 
 
+        let applayFilter = function () {
+            console.log("działa")
+        };
 
-//             // startImageData = ctx.getImageData(0,0,600,400)
-
+        redControl.onchange = function () {
+            let label = document.querySelector('label[for="red"] span');
+            label.innerHTML = this.value + '%';
+            applayFilter();
+        }
+        greenControl.onchange = function () {
+            let label = document.querySelector('label[for="green"] span');
+            label.innerHTML = this.value + '%';
+            applayFilter();
+        }
+        blueControl.onchange = function () {
+            let label = document.querySelector('label[for="blue"] span');
+            label.innerHTML = this.value + '%';
+            applayFilter();
+        }
 
     </script>
 
