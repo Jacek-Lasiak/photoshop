@@ -6,11 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
-
-    <style>
-
-
-    </style>
 </head>
 
 <body>
@@ -18,10 +13,7 @@
         <input type="file" name="file" id="pic">
         <input type="submit" />
     </form>
-
     <canvas id="Canvas" width="600" height="400"></canvas>
-
-    <!-- <div id="mouseSlider" onmousemove="mouseMove(event)" onmouseout="clearCoor()"></div> -->
     <form class="row">
         <div>
             <label for="red">Red: <span>100%</span></label>
@@ -35,6 +27,10 @@
             <label for="blue">Blue: <span>100%</span></label>
             <input type="range" id="blue" min="0" max="100" value="100">
         </div>
+        <div>
+            <label for="alpha">Transparency: <span>100%</span></label>
+            <input type="range" id="alpha" min="0" max="100" value="100">
+        </div>
     </form>
 
     <script>
@@ -44,38 +40,40 @@
         let redControl = document.getElementById('red');
         let greenControl = document.getElementById('green');
         let blueControl = document.getElementById('blue');
+        let alphaControl = document.getElementById('alpha');
         let readPixels;
         let writePixels;
         form.addEventListener('submit', (e) => {
             e.preventDefault();
 
-
             let org = document.createElement("IMG");
             org.crossOrigin = "Anonymous";
 
-            org.src = 'http://thedersen.com/talks/2012/01/25/javascript-the-good-parts/images/bad-vs-good.jpg';//'./' + document.getElementById("pic").files[0].name;         // 
+            if (e.target[0].value === '') {
+                org.src = 'http://thedersen.com/talks/2012/01/25/javascript-the-good-parts/images/bad-vs-good.jpg';
+            } else {
+                org.src = './' + document.getElementById("pic").files[0].name;
+            }
 
             org.onload = () => {
                 ctx.drawImage(org, 0, 0, 600, 400);
                 readPixels = ctx.getImageData(0, 0, 600, 400);
                 writePixels = ctx.getImageData(0, 0, c.width, c.height);
                 applayFilter();
-
             }
-
-
         })
-
 
         let applayFilter = function () {
             let red = redControl.value / 100;
             let green = greenControl.value / 100;
             let blue = blueControl.value / 100;
+            let alpha = alphaControl.value / 100;
+
             for (let i = 0; i < readPixels.data.length; i += 4) {
                 readPixels.data[i] = writePixels.data[i] * red;
                 readPixels.data[i + 1] = writePixels.data[i + 1] * green;
                 readPixels.data[i + 2] = writePixels.data[i + 2] * blue;
-                readPixels.data[i + 3] = writePixels.data[i + 3];
+                readPixels.data[i + 3] = writePixels.data[i + 3] * alpha;
             }
 
             ctx.putImageData(readPixels, 0, 0);
@@ -93,6 +91,11 @@
         }
         blueControl.onchange = function () {
             let label = document.querySelector('label[for="blue"] span');
+            label.innerHTML = this.value + '%';
+            applayFilter();
+        }
+        alphaControl.onchange = function () {
+            let label = document.querySelector('label[for="alpha"] span');
             label.innerHTML = this.value + '%';
             applayFilter();
         }
