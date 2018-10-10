@@ -44,28 +44,41 @@
         let redControl = document.getElementById('red');
         let greenControl = document.getElementById('green');
         let blueControl = document.getElementById('blue');
-
+        let readPixels;
+        let writePixels;
         form.addEventListener('submit', (e) => {
             e.preventDefault();
 
 
             let org = document.createElement("IMG");
-            org.src = './' + document.getElementById("pic").files[0].name;         // 'http://thedersen.com/talks/2012/01/25/javascript-the-good-parts/images/bad-vs-good.jpg';
+            org.crossOrigin = "Anonymous";
+
+            org.src = 'http://thedersen.com/talks/2012/01/25/javascript-the-good-parts/images/bad-vs-good.jpg';//'./' + document.getElementById("pic").files[0].name;         // 
 
             org.onload = () => {
                 ctx.drawImage(org, 0, 0, 600, 400);
+                readPixels = ctx.getImageData(0, 0, 600, 400);
+                writePixels = ctx.getImageData(0, 0, c.width, c.height);
+                applayFilter();
+
             }
 
 
-
-            readPixels = ctx.getImageData(0, 0, c.width, c.height);
-            writePixels = ctx.getImageData(0, 0, c.width, c.height);
-            applayFilter();
         })
 
 
         let applayFilter = function () {
-            console.log("działa")
+            let red = redControl.value / 100;
+            let green = greenControl.value / 100;
+            let blue = blueControl.value / 100;
+            for (let i = 0; i < readPixels.data.length; i += 4) {
+                readPixels.data[i] = writePixels.data[i] * red;
+                readPixels.data[i + 1] = writePixels.data[i + 1] * green;
+                readPixels.data[i + 2] = writePixels.data[i + 2] * blue;
+                readPixels.data[i + 3] = writePixels.data[i + 3];
+            }
+
+            ctx.putImageData(readPixels, 0, 0);
         };
 
         redControl.onchange = function () {
