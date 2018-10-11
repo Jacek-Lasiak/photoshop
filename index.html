@@ -32,6 +32,7 @@
             <input type="range" id="alpha" min="0" max="100" value="100">
         </div>
     </form>
+    <a id="button" href="#">SAVE AS PNG</a>
 
     <script>
         let c = document.getElementById("Canvas");
@@ -43,6 +44,14 @@
         let alphaControl = document.getElementById('alpha');
         let readPixels;
         let writePixels;
+        let pos = { x: 0, y: 0 };
+        let button = document.getElementById('button');
+
+        button.addEventListener('click', (e) => {
+            button.setAttribute('download', 'photoshoped.png');
+            button.setAttribute('href', c.toDataURL("image/png").replace("image/png", "image/octet-stream"));
+        })
+
         form.addEventListener('submit', (e) => {
             e.preventDefault();
 
@@ -57,7 +66,7 @@
 
             org.onload = () => {
                 ctx.drawImage(org, 0, 0, 600, 400);
-                readPixels = ctx.getImageData(0, 0, 600, 400);
+                readPixels = ctx.getImageData(0, 0, c.width, c.height);
                 writePixels = ctx.getImageData(0, 0, c.width, c.height);
                 applayFilter();
             }
@@ -68,7 +77,6 @@
             let green = greenControl.value / 100;
             let blue = blueControl.value / 100;
             let alpha = alphaControl.value / 100;
-
             for (let i = 0; i < readPixels.data.length; i += 4) {
                 readPixels.data[i] = writePixels.data[i] * red;
                 readPixels.data[i + 1] = writePixels.data[i + 1] * green;
@@ -99,6 +107,28 @@
             label.innerHTML = this.value + '%';
             applayFilter();
         }
+
+        function setPosition(e) {
+            pos.x = e.clientX;
+            pos.y = e.clientY;
+        }
+        document.addEventListener('mousemove', (e) => {
+            if (e.buttons !== 1) return;
+
+            ctx.beginPath();
+
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = '#ddd';
+
+            ctx.moveTo(pos.x, pos.y);
+            setPosition(e);
+            ctx.lineTo(pos.x, pos.y);
+
+            ctx.stroke();
+        });
+        document.addEventListener('mousedown', setPosition);
+        document.addEventListener('mouseenter', setPosition);
 
     </script>
 
