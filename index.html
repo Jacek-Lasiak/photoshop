@@ -31,6 +31,14 @@
             <label for="alpha">Transparency: <span>100%</span></label>
             <input type="range" id="alpha" min="0" max="100" value="100">
         </div>
+        <div>
+            <label for="contrast">Contrast: <span>0%</span></label>
+            <input style="width:300px" type="range" id="contrast" min="-100" max="100" value="0">
+        </div>
+        <div>
+            <label for="brightness">Brightness: <span>0%</span></label>
+            <input style="width:300px" type="range" id="brightness" min="-100" max="100" value="0">
+        </div>
     </form>
     <a id="button" href="#">SAVE AS PNG</a>
 
@@ -42,6 +50,8 @@
         let greenControl = document.getElementById('green');
         let blueControl = document.getElementById('blue');
         let alphaControl = document.getElementById('alpha');
+        let contrastControl = document.getElementById('contrast');
+        let brightnessControl = document.getElementById('brightness');
         let readPixels;
         let writePixels;
         let pos = { x: 0, y: 0 };
@@ -71,16 +81,28 @@
                 applayFilter();
             }
         })
+        function truncateColor(value) {
+            if (value < 0) {
+                value = 0;
+            } else if (value > 255) {
+                value = 255;
+            }
 
+            return value;
+        }
         let applayFilter = function () {
             let red = redControl.value / 100;
             let green = greenControl.value / 100;
             let blue = blueControl.value / 100;
             let alpha = alphaControl.value / 100;
+            let contr = (parseFloat(contrastControl.value) || 0) + 1;
+            var factor = (259.0 * (contr + 255.0)) / (255.0 * (259.0 - contr));
+            let bright = brightnessControl.value / 100;
+            console.log(factor);
             for (let i = 0; i < readPixels.data.length; i += 4) {
-                readPixels.data[i] = writePixels.data[i] * red;
-                readPixels.data[i + 1] = writePixels.data[i + 1] * green;
-                readPixels.data[i + 2] = writePixels.data[i + 2] * blue;
+                readPixels.data[i] = truncateColor(factor * (((writePixels.data[i] * red) + 255 * bright) - 128.0) + 128.0);//((writePixels.data[i] * red) + 255 * bright);
+                readPixels.data[i + 1] = truncateColor(factor * (((writePixels.data[i + 1] * green) + 255 * bright) - 128.0) + 128.0);//(writePixels.data[i + 1] * green) + 255 * bright;
+                readPixels.data[i + 2] = truncateColor(factor * (((writePixels.data[i + 2] * blue) + 255 * bright) - 128.0) + 128.0);//(writePixels.data[i + 2] * blue) + 255 * bright;
                 readPixels.data[i + 3] = writePixels.data[i + 3] * alpha;
             }
 
@@ -104,6 +126,16 @@
         }
         alphaControl.onchange = function () {
             let label = document.querySelector('label[for="alpha"] span');
+            label.innerHTML = this.value + '%';
+            applayFilter();
+        }
+        contrastControl.onchange = function () {
+            let label = document.querySelector('label[for="contrast"] span');
+            label.innerHTML = this.value + '%';
+            applayFilter();
+        }
+        brightnessControl.onchange = function () {
+            let label = document.querySelector('label[for="brightness"] span');
             label.innerHTML = this.value + '%';
             applayFilter();
         }
